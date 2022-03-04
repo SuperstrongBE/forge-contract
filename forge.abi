@@ -1,0 +1,55 @@
+{
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT ",
+    "version": "eosio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "getlicense",
+            "base": "",
+            "fields": [
+                {
+                    "name": "registree",
+                    "type": "name"
+                },
+                {
+                    "name": "type",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "licenses",
+            "base": "",
+            "fields": [
+                {
+                    "name": "user",
+                    "type": "name"
+                },
+                {
+                    "name": "enddate",
+                    "type": "uint32"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "getlicense",
+            "type": "getlicense",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [
+        {
+            "name": "licenses",
+            "type": "licenses",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        }
+    ],
+    "kv_tables": {},
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": []
+}
