@@ -34,10 +34,10 @@ class[[eosio::contract]] forge : public eosio::contract {
         });
       }
 
-      // Find the members wallet
+      
       license_table licenses(get_self(), get_self().value);
       auto licence = licenses.find(caller.value);
-      // Update the wallet balance
+      
       if (licence != licenses.end()) {
         licenses.modify(licence, get_self(), [&](auto &row) {
           row.endate +=2592000;
@@ -45,10 +45,9 @@ class[[eosio::contract]] forge : public eosio::contract {
       } else {
         licenses.emplace(get_self(), [&](auto &row) {
           row.account = caller;
-          row.endate = 18;
+          row.endate = (current_time_point().sec_since_epoch()+2592000);
         });
       }
-
     }
 
   private:
@@ -61,7 +60,7 @@ class[[eosio::contract]] forge : public eosio::contract {
 
     struct [[eosio::table]] LicenseStruct {
       name          account;
-      uint64_t      endate = 0;
+      uint32_t      endate = 0;
       auto primary_key() const { return account.value; }
     };
 

@@ -13,7 +13,7 @@
                 },
                 {
                     "name": "endate",
-                    "type": "uint64"
+                    "type": "uint32"
                 }
             ]
         },
