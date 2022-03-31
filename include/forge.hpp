@@ -7,17 +7,21 @@ using namespace std;
 using namespace eosio;
 
 CONTRACT forge : public contract {
-  public:
-    using contract::contract;
-    ACTION getlicense(name registree,string type);
+ 
     private:
-      TABLE licenses {
-        name  user;
-        uint32_t enddate ;
-        auto primary_key() const {return user.value;}
-      };
-    
-      typedef multi_index<name("licenses"),licenses>licenses_table;
+ struct [[eosio::table]] WalletStruct {
+      name          account;
+      uint64_t      balance = 0;
+      auto primary_key() const { return account.value; }
+    };
+    typedef multi_index<"wallets"_n, WalletStruct> wallet_table;
 
+    struct [[eosio::table]] LicenseStruct {
+      name          account;
+      uint64_t      endate = 0;
+      auto primary_key() const { return account.value; }
+    };
+
+    typedef multi_index<"licenses"_n, LicenseStruct> license_table;
   
 };

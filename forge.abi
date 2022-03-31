@@ -4,45 +4,46 @@
     "types": [],
     "structs": [
         {
-            "name": "getlicense",
+            "name": "LicenseStruct",
             "base": "",
             "fields": [
                 {
-                    "name": "registree",
+                    "name": "account",
                     "type": "name"
                 },
                 {
-                    "name": "type",
-                    "type": "string"
+                    "name": "endate",
+                    "type": "uint64"
                 }
             ]
         },
         {
-            "name": "licenses",
+            "name": "WalletStruct",
             "base": "",
             "fields": [
                 {
-                    "name": "user",
+                    "name": "account",
                     "type": "name"
                 },
                 {
-                    "name": "enddate",
-                    "type": "uint32"
+                    "name": "balance",
+                    "type": "uint64"
                 }
             ]
         }
     ],
-    "actions": [
-        {
-            "name": "getlicense",
-            "type": "getlicense",
-            "ricardian_contract": ""
-        }
-    ],
+    "actions": [],
     "tables": [
         {
             "name": "licenses",
-            "type": "licenses",
+            "type": "LicenseStruct",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "wallets",
+            "type": "WalletStruct",
             "index_type": "i64",
             "key_names": [],
             "key_types": []

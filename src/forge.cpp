@@ -1,40 +1,69 @@
-#include <forge.hpp>
-#include <eosio/eosio.hpp>
-#include <eosio/print.hpp>
 #include <eosio/asset.hpp>
+#include <eosio/eosio.hpp>
 #include <eosio/system.hpp>
 
 using namespace eosio;
 
-ACTION forge::getlicense(name registree, string type) {
-  // Check fo user auth
-  check(has_auth(registree),"This user not exists");
-  //A line to force build
-  //Pay for license
-  action(
-        permission_level{registree,"active"_n},
-        "xtokens"_n,
-        "transfer"_n,
-        std::make_tuple(get_self(),registree, asset{ 10, symbol{"USDT", 6}} , std::string("money in your pocket !"))
-         ).send();
+class[[eosio::contract]] forge : public eosio::contract {
 
-  //Init licenses table
-  licenses_table _licenses(get_self(),get_self().value);
-  auto lsc_itr = _licenses.find(registree.value);
+  public:
 
-  if (lsc_itr == _licenses.end()) {
-    // Create a record user dont own a license
-    _licenses.emplace(registree, [&](auto& license) {
-      license.user = registree;
-      license.enddate = (current_time_point().sec_since_epoch()+2592000); 
+    using contract::contract;
 
-    });
-  } else {
-    // extends license user if exist
-    _licenses.modify(lsc_itr, registree, [&](auto& license) {
-      license.enddate +=+2592000;
-    });
-  }
-}
+    [[eosio::on_notify("eosio.token::transfer")]] void received(const eosio::name caller, eosio::name receiver, eosio::asset value, std::string memo) {
+      // Validate transaction participants and escape
+      if (receiver != get_self() || caller == get_self()) return;
+      // Define token symbol
+      eosio::symbol token_symbol("TUB", 0);
+      // Validate contract state and arguments
+      eosio::check(value.amount > 0, "Insufficient value");
+      eosio::check(value.symbol == token_symbol, "Illegal asset symbol");
+      
+      // Find the members wallet
+      wallet_table balances(get_self(), get_self().value);
+      auto wallet = balances.find(caller.value);
+      // Update the wallet balance
+      if (wallet != balances.end()) {
+        balances.modify(wallet, get_self(), [&](auto &row) {
+          row.balance += value.amount;
+        });
+      } else {
+        balances.emplace(get_self(), [&](auto &row) {
+          row.account = caller;
+          row.balance = value.amount;
+        });
+      }
 
-EOSIO_DISPATCH(forge, (getlicense))
+      // Find the members wallet
+      license_table licenses(get_self(), get_self().value);
+      auto licence = licenses.find(caller.value);
+      // Update the wallet balance
+      if (licence != licenses.end()) {
+        licenses.modify(licence, get_self(), [&](auto &row) {
+          row.endate +=2592000;
+        });
+      } else {
+        licenses.emplace(get_self(), [&](auto &row) {
+          row.account = caller;
+          row.endate = 18;
+        });
+      }
+
+    }
+
+  private:
+    struct [[eosio::table]] WalletStruct {
+      name          account;
+      uint64_t      balance = 0;
+      auto primary_key() const { return account.value; }
+    };
+    typedef multi_index<"wallets"_n, WalletStruct> wallet_table;
+
+    struct [[eosio::table]] LicenseStruct {
+      name          account;
+      uint64_t      endate = 0;
+      auto primary_key() const { return account.value; }
+    };
+
+    typedef multi_index<"licenses"_n, LicenseStruct> license_table;
+};
